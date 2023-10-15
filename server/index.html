@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>CES Testing</title>
+  </head>
+  <body>
+    <form onsubmit="event.preventDefault(); fetchMedianCes();">
+      <label for="longitude">Longitude:</label>
+      <input
+        type="text"
+        id="longitude"
+        name="longitude"
+        value="-122.23"
+      /><br />
+
+      <label for="latitude">Latitude:</label>
+      <input type="text" id="latitude" name="latitude" value="37.88" /><br />
+
+      <label for="housing_median_age">Housing Median Age:</label>
+      <input
+        type="text"
+        id="housing_median_age"
+        name="housing_median_age"
+        value="41"
+      /><br />
+
+      <label for="total_rooms">Total Rooms:</label>
+      <input
+        type="text"
+        id="total_rooms"
+        name="total_rooms"
+        value="880"
+      /><br />
+
+      <label for="total_bedrooms">Total Bedrooms:</label>
+      <input
+        type="text"
+        id="total_bedrooms"
+        name="total_bedrooms"
+        value="129"
+      /><br />
+
+      <label for="population">Population:</label>
+      <input type="text" id="population" name="population" value="322" /><br />
+
+      <label for="households">Households:</label>
+      <input type="text" id="households" name="households" value="126" /><br />
+
+      <label for="median_income">Median Income:</label>
+      <input
+        type="text"
+        id="median_income"
+        name="median_income"
+        value="8.3252"
+      /><br />
+
+      <label for="ocean_proximity">Ocean Proximity:</label>
+      <select id="ocean_proximity" name="ocean_proximity">
+        <option value="0">1H OCEAN</option>
+        <option value="1">INLAND</option>
+        <option value="2">ISLAND</option>
+        <option value="3">NEAR BAY</option>
+        <option value="4">NEAR OCEAN</option></select
+      ><br />
+
+      <button type="submit">Submit</button>
+      <br />
+      <label for="median_ces_estimate">Median CES estimate:</label>
+      <output id="median_ces_estimate"></output><br />
+      <label for="median_ces_upperbound">Upper bound:</label>
+      <output id="median_ces_upperbound"></output><br />
+      <label for="median_ces_upperbound">Lower bound:</label>
+      <output id="median_ces_lowerbound"></output><br />
+    </form>
+
+    <script>
+      async function fetchMedianCes() {
+        const form = document.querySelector("form");
+        const formData = new FormData(form);
+
+        let response = await fetch("http://localhost:5000/predict", {
+          method: "POST",
+          body: formData,
+        });
+        if (response.ok) {
+          let json = await response.json();
+          console.log(json)
+          const median_ces_estimate = document.getElementById(
+              "median_ces_estimate"
+            );
+          median_ces_estimate.value = json['y_est'];
+          const median_ces_upperbound = document.getElementById(
+            "median_ces_upperbound"
+          );
+          median_ces_upperbound.value = json['y_upper'];
+          const median_ces_lowerbound = document.getElementById(
+            "median_ces_lowerbound"
+          );
+          median_ces_lowerbound.value = json['y_lower'];
+        } else {
+          let json = await response.json();
+          console.log(json)
+          alert("HTTP-Error: " + response.status);
+        }
+      }
+    </script>
+  </body>
+</html>
